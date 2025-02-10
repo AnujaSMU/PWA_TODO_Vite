@@ -5,37 +5,37 @@ import './App.css';
 import { addTodoToDB, getTodosFromDB, deleteTodoFromDB } from './db';
 
 function App() {
-  const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState("");
+  const [todos, setTodos] = useState([]); // State to hold the list of todos
+  const [newTodo, setNewTodo] = useState(""); // State to hold the new todo input
 
   useEffect(() => {
     const fetchTodos = async () => {
-      const todosFromDB = await getTodosFromDB();
-      setTodos(todosFromDB);
+      const todosFromDB = await getTodosFromDB(); // Fetch todos from the database
+      setTodos(todosFromDB); // Set the fetched todos to state
     };
     fetchTodos();
   }, []);
 
   const addTodo = async () => {
     if (newTodo.trim() !== "") {
-      const newTodoObj = { text: newTodo, completed: false };
-      await addTodoToDB(newTodoObj);
-      setTodos([...todos, newTodoObj]);
-      setNewTodo("");
+      const newTodoObj = { text: newTodo, completed: false }; // Create a new todo object
+      await addTodoToDB(newTodoObj); 
+      setTodos([...todos, newTodoObj]); // Update the state with the new todo
+      setNewTodo(""); 
     }
   };
 
   const deleteTodo = async (id) => {
-    await deleteTodoFromDB(id);
-    const newTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(newTodos);
+    await deleteTodoFromDB(id); // Delete the todo from the database
+    const newTodos = todos.filter((todo) => todo.id !== id); // Filter out the deleted todo
+    setTodos(newTodos); // Update the state with the remaining todos
   };
 
   const toggleTodo = (index) => {
     const newTodos = todos.map((todo, i) => 
-      i === index ? { ...todo, completed: !todo.completed } : todo
+      i === index ? { ...todo, completed: !todo.completed } : todo // Toggle the completed status
     );
-    setTodos(newTodos);
+    setTodos(newTodos); // Update the state with the toggled todo
   };
 
   return (
@@ -45,10 +45,10 @@ function App() {
         <input
           type="text"
           value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
+          onChange={(e) => setNewTodo(e.target.value)} // Update the new todo input state
           placeholder="Add a new todo"
         />
-        <button onClick={addTodo}>Add</button>
+        <button onClick={addTodo}>Add</button> {/* Add the new todo */}
       </div>
       <ul>
         {todos.map((todo, index) => (
@@ -56,13 +56,13 @@ function App() {
             <input
               type="checkbox"
               checked={todo.completed}
-              onChange={() => toggleTodo(index)}
+              onChange={() => toggleTodo(index)} // Toggle the completed status
             />
             <span style={{ textDecoration: todo.completed ? "line-through" : "none" }}>
               {todo.text}
             </span>
             {todo.completed && (
-              <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+              <button onClick={() => deleteTodo(todo.id)}>Delete</button> // Delete the todo
             )}
           </li>
         ))}
