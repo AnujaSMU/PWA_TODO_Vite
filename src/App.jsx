@@ -1,41 +1,51 @@
 import { useState, useEffect } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import './App.css';
-import { addTodoToDB, getTodosFromDB, deleteTodoFromDB } from './db';
+import { addTodoToDB, getTodosFromDB, deleteTodoFromDB, updateTodoInDB } from './db';
 
 function App() {
-  const [todos, setTodos] = useState([]); // State to hold the list of todos
-  const [newTodo, setNewTodo] = useState(""); // State to hold the new todo input
+  const [todos, setTodos] = useState([]);
+  const [newTodo, setNewTodo] = useState("");
+  const [newPriority, setNewPriority] = useState("normal");
+  const [hoveredTodoId, setHoveredTodoId] = useState(null);
 
   useEffect(() => {
     const fetchTodos = async () => {
-      const todosFromDB = await getTodosFromDB(); // Fetch todos from the database
-      setTodos(todosFromDB); // Set the fetched todos to state
+      const todosFromDB = await getTodosFromDB();
+      setTodos(todosFromDB);
     };
     fetchTodos();
   }, []);
 
   const addTodo = async () => {
     if (newTodo.trim() !== "") {
-      const newTodoObj = { text: newTodo, completed: false }; // Create a new todo object
-      await addTodoToDB(newTodoObj); 
-      setTodos([...todos, newTodoObj]); // Update the state with the new todo
-      setNewTodo(""); 
+      const newTodoObj = { text: newTodo, completed: false, priority: newPriority };
+      await addTodoToDB(newTodoObj);
+      setTodos([...todos, newTodoObj]);
+      setNewTodo("");
+      setNewPriority("normal");
     }
   };
 
   const deleteTodo = async (id) => {
-    await deleteTodoFromDB(id); // Delete the todo from the database
-    const newTodos = todos.filter((todo) => todo.id !== id); // Filter out the deleted todo
-    setTodos(newTodos); // Update the state with the remaining todos
+    await deleteTodoFromDB(id);
+    const newTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(newTodos);
   };
 
   const toggleTodo = (index) => {
     const newTodos = todos.map((todo, i) => 
-      i === index ? { ...todo, completed: !todo.completed } : todo // Toggle the completed status
+      i === index ? { ...todo, completed: !todo.completed } : todo
     );
-    setTodos(newTodos); // Update the state with the toggled todo
+    setTodos(newTodos);
+  };
+
+  const updatePriority = async (id, newPriority) => {
+    const updatedTodos = todos.map((todo) => 
+      todo.id === id ? { ...todo, priority: newPriority } : todo
+    );
+    setTodos(updatedTodos);
+    const updatedTodo = updatedTodos.find((todo) => todo.id === id);
+    await updateTodoInDB(id, updatedTodo);
   };
 
   return (
@@ -45,24 +55,43 @@ function App() {
         <input
           type="text"
           value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)} // Update the new todo input state
+          onChange={(e) => setNewTodo(e.target.value)}
           placeholder="Add a new todo"
         />
-        <button onClick={addTodo}>Add</button> {/* Add the new todo */}
+        <select value={newPriority} onChange={(e) => setNewPriority(e.target.value)}>
+          <option value="urgent">Urgent</option>
+          <option value="normal">Normal</option>
+          <option value="low">Low</option>
+        </select>
+        <button onClick={addTodo}>Add</button>
       </div>
       <ul>
         {todos.map((todo, index) => (
-          <li key={index}>
+          <li 
+            key={todo.id}
+            onMouseEnter={() => setHoveredTodoId(todo.id)}
+            onMouseLeave={() => setHoveredTodoId(null)}
+          >
             <input
               type="checkbox"
               checked={todo.completed}
-              onChange={() => toggleTodo(index)} // Toggle the completed status
+              onChange={() => toggleTodo(index)}
             />
             <span style={{ textDecoration: todo.completed ? "line-through" : "none" }}>
-              {todo.text}
+              {todo.text} ({todo.priority})
             </span>
+            {hoveredTodoId === todo.id && (
+              <select
+                value={todo.priority}
+                onChange={(e) => updatePriority(todo.id, e.target.value)}
+              >
+                <option value="urgent">Urgent</option>
+                <option value="normal">Normal</option>
+                <option value="low">Low</option>
+              </select>
+            )}
             {todo.completed && (
-              <button onClick={() => deleteTodo(todo.id)}>Delete</button> // Delete the todo
+              <button onClick={() => deleteTodo(todo.id)}>Delete</button>
             )}
           </li>
         ))}

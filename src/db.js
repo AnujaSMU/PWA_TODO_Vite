@@ -52,3 +52,15 @@ export const deleteTodoFromDB = async (id) => {
   const db = await initDB();
   return db.delete(STORE_NAME, id);
 };
+
+/**
+ * Updates a todo in the IndexedDB database.
+ * 
+ * @param {string} id The ID of the todo to update.
+ * @param {Object} updatedTodo The updated todo object.
+ * @returns {Promise<void>} A promise that resolves when the todo is updated.
+ */
+export const updateTodoInDB = async (id, updatedTodo) => {
+  const db = await initDB();
+  return db.put(STORE_NAME, { ...updatedTodo, id });
+};
