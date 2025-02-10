@@ -1,8 +1,27 @@
-# React + Vite
+# React + Vite TODO App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a TODO application built with React and Vite. It uses IndexedDB for offline storage and a service worker for offline capabilities.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Prerequisites
+
+- Node.js (version 14 or higher)
+
+### Installation
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/your-username/pwaTODO_Vite.git
+   cd pwaTODO_Vite 
+   ```
+2. Install the dependencies
+ ```sh 
+ npm install 
+ ```
+### Running the App
+To start the development server:
+```sh
+npm run dev
+```
